@@ -1,0 +1,60 @@
+<h2>Messung Detail</h2>
+
+<div *ngIf="loading">Lade...</div>
+<div *ngIf="error">{{ error }}</div>
+
+<div *ngIf="measurement && !loading && !error">
+  <p><b>UUID:</b> {{ measurement.uuid }}</p>
+  <p><b>Start:</b> {{ measurement.startTime | date:'short' }}</p>
+  <p><b>Rolle:</b> {{ measurement.performedByRole }}</p>
+
+  <hr />
+
+  <h3>Raw Signal</h3>
+
+  <div *ngIf="!rawSignal">
+    Raw-Signal konnte nicht geparst werden oder hat falsches Format.
+  </div>
+
+  <div *ngIf="rawSignal">
+    <p>
+      <b>X:</b> {{ rawSignal.xUnit }}
+      &nbsp;|&nbsp;
+      <b>Y:</b> {{ rawSignal.yUnit }}
+      &nbsp;|&nbsp;
+      <b>Punkte:</b> {{ rawSignal.points.length }}
+    </p>
+
+    <!-- Minimal: erstmal nur Tabelle / Debug -->
+    <table>
+      <thead>
+      <tr><th>x</th><th>y</th></tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let p of rawSignal.points | slice:0:20">
+        <td>{{ p.x }}</td>
+        <td>{{ p.y }}</td>
+      </tr>
+      </tbody>
+    </table>
+
+    <p *ngIf="rawSignal.points.length > 20">
+      (zeige nur die ersten 20 Punkte)
+    </p>
+  </div>
+  <div *ngIf="measurement as m; else loading">
+    <h2>Measurement {{ m.uuid }}</h2>
+
+    <div style="height: 380px; margin-top: 16px;">
+      <canvas #signalCanvas *ngIf="rawSignal; else noSignal"></canvas>
+      <ng-template #noSignal>
+        <p>Kein Rohsignal vorhanden oder ungültiges Format.</p>
+      </ng-template>
+    </div>
+  </div>
+
+  <ng-template #loading>
+    <p>Lade Messung…</p>
+  </ng-template>
+
+</div>

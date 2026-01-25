@@ -1,0 +1,28 @@
+<h2>Messungen</h2>
+
+<div *ngIf="loading">Lade...</div>
+<div *ngIf="error">{{ error }}</div>
+
+<table *ngIf="!loading && !error">
+  <thead>
+  <tr>
+    <th>Start</th>
+    <th>Rolle</th>
+    <th>Batch</th>
+    <th>Device</th>
+    <th></th>
+  </tr>
+  </thead>
+
+  <tbody>
+  <tr *ngFor="let m of items">
+    <td>{{ m.startTime | date:'short' }}</td>
+    <td>{{ m.performedByRole }}</td>
+    <td>{{ m.batchCode ?? '-' }}</td>
+    <td>{{ m.deviceSerial ?? '-' }}</td>
+    <td>
+      <button (click)="open(m.uuid)">Detail</button>
+    </td>
+  </tr>
+  </tbody>
+</table>
