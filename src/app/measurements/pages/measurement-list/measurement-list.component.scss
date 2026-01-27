@@ -1,0 +1,171 @@
+/* measurement-list.component.css
+   Minimal "Bootstrap-ish" utility + component set.
+   Implements only what the HTML above uses.
+*/
+
+:host {
+  display: block;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  color: #222;
+  font-size: 14px;
+}
+
+/* --- Layout primitives --- */
+.container { max-width: 1200px; margin-inline: auto; padding-inline: 16px; }
+.row { display: flex; flex-wrap: wrap; }
+.col { flex: 1 1 0; min-width: 280px; }
+.col-12 { flex: 0 0 100%; }
+.col-auto { flex: 0 0 auto; }
+.align-items-end { align-items: flex-end; }
+.align-items-center { align-items: center; }
+.justify-content-center { justify-content: center; }
+.d-flex { display: flex; }
+.gap-2 { gap: 8px; }
+.g-3 { gap: 12px; }
+.mb-0 { margin-bottom: 0; }
+.mb-3 { margin-bottom: 12px; }
+.py-3 { padding-block: 12px; }
+.py-4 { padding-block: 16px; }
+
+/* --- Typography helpers --- */
+.text-muted { color: #6b7280; }
+.text-center { text-align: center; }
+.font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+
+/* --- Links --- */
+.link { color: #2563eb; text-decoration: none; font-weight: 600; }
+.link:hover { text-decoration: underline; }
+
+/* --- Forms --- */
+.form-label { display: block; font-weight: 600; margin-bottom: 6px; color: #374151; }
+.form-text { margin-top: 6px; font-size: 12px; color: #6b7280; }
+
+.form-control,
+.form-select {
+  height: 34px;
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #fff;
+  outline: none;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.form-control-sm { height: 32px; padding: 4px 8px; }
+
+/* --- Alerts --- */
+.alert {
+  margin: 12px 16px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+}
+.alert-info { background: #f3f4f6; border-color: #e5e7eb; color: #374151; }
+.alert-danger { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+
+/* --- Badges --- */
+.badge {
+  display: inline-block;
+  padding: 6px 12px;
+  font-weight: 700;
+  font-size: 13px;
+  border-radius: 6px;
+}
+.badge-pill { border-radius: 999px; }
+.badge-success { background: #22c55e; color: #fff; }
+
+/* --- Nav tabs --- */
+.nav { list-style: none; padding-left: 0; margin: 0; display: flex; }
+.nav-tabs {
+  border-bottom: 1px solid #e5e7eb;
+  gap: 4px;
+}
+.nav-item { margin: 0; }
+
+.nav-link {
+  border: 1px solid transparent;
+  border-bottom: none;
+  background: transparent;
+  padding: 8px 12px;
+  border-radius: 8px 8px 0 0;
+  cursor: pointer;
+  color: #374151;
+  font-weight: 600;
+}
+.nav-link:hover { background: #f3f4f6; }
+.nav-link.active {
+  background: #fff;
+  border-color: #e5e7eb;
+  color: #111827;
+}
+
+/* --- Card --- */
+.card {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  overflow: hidden;
+}
+
+/* --- Table --- */
+.table-responsive { width: 100%; overflow-x: auto; }
+
+.table { width: 100%; border-collapse: collapse; }
+.table th, .table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f1f5f9;
+  text-align: left;
+  vertical-align: middle;
+}
+.table thead th {
+  background: #f8fafc;
+  color: #374151;
+  font-weight: 700;
+  border-bottom: 1px solid #e5e7eb;
+}
+.table-hover tbody tr:hover { background: #f9fafb; }
+
+
+/*Modal*/
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  display: grid;
+  place-items: center;
+  z-index: 999;
+}
+
+.modal {
+  width: min(520px, 92vw);
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
+.modal__header, .modal__footer {
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8fafc;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modal__footer {
+  border-bottom: none;
+  border-top: 1px solid #e5e7eb;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.modal__body {
+  padding: 14px;
+}

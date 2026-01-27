@@ -1,28 +1,172 @@
-<h2>Messungen</h2>
+<!-- measurement-list.component.html -->
 
-<div *ngIf="loading">Lade...</div>
-<div *ngIf="error">{{ error }}</div>
+<!-- Status messages -->
+<div *ngIf="loading" class="alert alert-info">Loading...</div>
+<div *ngIf="!loading && error" class="alert alert-danger">{{ error }}</div>
 
-<table *ngIf="!loading && !error">
-  <thead>
-  <tr>
-    <th>Start</th>
-    <th>Rolle</th>
-    <th>Batch</th>
-    <th>Device</th>
-    <th></th>
-  </tr>
-  </thead>
+<section *ngIf="!loading && !error" class="container py-3">
 
-  <tbody>
-  <tr *ngFor="let m of items">
-    <td>{{ m.startTime | date:'short' }}</td>
-    <td>{{ m.performedByRole }}</td>
-    <td>{{ m.batchCode ?? '-' }}</td>
-    <td>{{ m.deviceSerial ?? '-' }}</td>
-    <td>
-      <button (click)="open(m.uuid)">Detail</button>
-    </td>
-  </tr>
-  </tbody>
-</table>
+  <!-- Breadcrumb / Back -->
+  <div class="d-flex align-items-center gap-2 mb-3">
+    <a routerLink=".." class="link">← Back</a>
+    <span class="text-muted">Measurements / Results</span>
+  </div>
+
+  <!-- Title pill (centered) -->
+  <div class="d-flex justify-content-center mb-3">
+    <span class="badge badge-success badge-pill">Your Measurements</span>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="row g-3 align-items-end mb-3">
+
+    <!-- Search -->
+    <div class="col">
+      <label class="form-label">Search</label>
+      <input
+        class="form-control"
+        type="text"
+        placeholder="UUID, batch code, electrode batch code, or text..."
+        [(ngModel)]="query"
+      />
+      <div class="form-text">Use the date filter for a time range.</div>
+    </div>
+
+    <!-- Electrode batch filter -->
+    <div class="col-auto">
+      <label class="form-label">Electrode batch</label>
+      <input
+        class="form-control"
+        type="text"
+        placeholder="i.e 0x00..."
+        [(ngModel)]="electrodeBatchFilter"
+      />
+    </div>
+
+    <!-- Date range -->
+    <div class="col-auto">
+      <label class="form-label">Date range</label>
+      <div class="d-flex align-items-center gap-2">
+        <input
+          type="date"
+          class="form-control form-control-sm"
+          [(ngModel)]="fromDate"
+          aria-label="From date"
+        />
+        <span class="text-muted">-</span>
+        <input
+          type="date"
+          class="form-control form-control-sm"
+          [(ngModel)]="toDate"
+          aria-label="To date"
+        />
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="col-12">
+      <ul class="nav nav-tabs" role="tablist" aria-label="Measurement type tabs">
+        <li class="nav-item">
+          <button
+            class="nav-link"
+            [class.active]="activeTab === 'ALL'"
+            (click)="activeTab = 'ALL'"
+            type="button"
+          >
+            All
+          </button>
+        </li>
+        <li class="nav-item">
+          <button
+            class="nav-link"
+            [class.active]="activeTab === 'STANDARD'"
+            (click)="activeTab = 'STANDARD'"
+            type="button"
+          >
+            Standard
+          </button>
+        </li>
+        <li class="nav-item">
+          <button
+            class="nav-link"
+            [class.active]="activeTab === 'CALIBRATION'"
+            (click)="activeTab = 'CALIBRATION'"
+            type="button"
+          >
+            Calibration
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Table action bar -->
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <span class="text-muted" *ngIf="selected.size > 0">
+      {{ selected.size }} selected
+    </span>
+    <span *ngIf="selected.size === 0"></span>
+    <button
+      type="button"
+      class="btn btn-primary"
+      [disabled]="selected.size === 0"
+      (click)="openMarkCalibrationModal()"
+    >
+      Mark selected as calibration...
+    </button>
+  </div>
+
+  <!-- Table -->
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th style="width: 48px;"></th>
+            <th>UUID</th>
+            <th>Date</th>
+            <th>BatchCode</th>
+            <th>ElectrodeBatchCode</th>
+            <th>Type</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let m of filteredItems; trackBy: trackByUuid">
+            <td>
+              <input
+                type="checkbox"
+                class="form-check-input"
+                [disabled]="m.measurementType !== 'STANDARD'"
+                [checked]="selected.has(m.uuid)"
+                (change)="toggleSelection(m.uuid, $any($event.target).checked)"
+                aria-label="Select measurement"
+              />
+            </td>
+            <td class="font-monospace">{{ m.uuid | slice:0:8 }}...</td>
+            <td>{{ m.startTime | date:'yyyy-MM-dd' }}</td>
+            <td class="font-monospace">{{ m.batchCode }}</td>
+            <td class="font-monospace">{{ m.electrodeBatchCode }}</td>
+            <td>{{ m.measurementType }}</td>
+          </tr>
+
+          <!-- Empty state -->
+          <tr *ngIf="filteredItems.length === 0">
+            <td colspan="6" class="text-center text-muted py-4">
+              No results match the current filters.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</section>
+
+<!-- Modal (outside section to avoid z-index issues) -->
+<app-mark-calibration-modal
+  *ngIf="modalOpen"
+  [selectedCount]="selected.size"
+  (cancel)="closeModal()"
+  (confirm)="onMarkCalibrationConfirm($event)"
+></app-mark-calibration-modal>

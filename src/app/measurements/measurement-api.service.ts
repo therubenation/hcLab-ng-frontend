@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { MeasurementSummaryDto } from './dto/measurement-summary.dto';
 import { MeasurementDetailDto } from './dto/measurement-detail.dto';
+import {MarkCalibrationRequestDto} from './dto/mark-calibration-request.dto';
 
 @Injectable({ providedIn: 'root' })
 export class MeasurementApiService {
@@ -15,6 +16,13 @@ export class MeasurementApiService {
   }
 
   getByUuid(uuid: string): Observable<MeasurementDetailDto> {
-    return this.http.get<MeasurementDetailDto>(`${this.baseUrl}/uuid/${uuid}`);
+    return this.http.get<MeasurementDetailDto>(`${this.baseUrl}/${uuid}`);
+  }
+
+  markCalibration(uuid: string, payload: MarkCalibrationRequestDto) {
+    return this.http.patch<MeasurementDetailDto>(
+      `${this.baseUrl}/${uuid}/mark-calibration`,
+      payload
+    );
   }
 }

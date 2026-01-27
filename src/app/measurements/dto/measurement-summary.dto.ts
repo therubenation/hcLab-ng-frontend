@@ -1,11 +1,12 @@
 export interface MeasurementSummaryDto {
   uuid: string;
-  startTime: string;          // ISO string
-  endTime?: string | null;    // ISO string
+  startTime: string;
+  endTime: string | null;
   performedByRole: string;
-
-  // Optional: je nachdem, was du im Summary wirklich zurückgibst
-  batchCode?: string;
-  deviceSerial?: string;
-  hormoneName?: string;
+  batchCode: string | null;
+  electrodeBatchCode: string | null;
+  hormoneName: string | null;
+  deviceSerial: string | null;
+  testProtocolId: number | null;
+  measurementType: string | null;
 }
