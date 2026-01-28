@@ -3,5 +3,6 @@ export interface MarkCalibrationRequestDto {
   referenceConcentration?: number | null;
   referenceConcentrationUnit?: string | null;
   replicateLabel?: string | null;
-  includedInCalibration?: boolean | null;
+  // includedInCalibration entfernt — gehört zu Schritt B (Kurven-Erstellung),
+  // nicht zu Schritt A (Klassifikation als Kalibriermessung)
 }

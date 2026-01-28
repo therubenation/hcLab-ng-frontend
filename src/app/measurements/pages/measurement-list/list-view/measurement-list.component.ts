@@ -2,18 +2,17 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { forkJoin } from 'rxjs';
-import { MeasurementApiService } from '../../measurement-api.service';
-import { MeasurementSummaryDto } from '../../dto/measurement-summary.dto';
+import { MeasurementApiService } from '../../../measurement-api.service';
+import { MeasurementSummaryDto } from '../../../dto/measurement-summary.dto';
 import {
-  MarkCalibrationModalComponent,
+  MeasurementListModalComponent,
   MarkCalibrationResult
-} from '../../components/mark-calibration-modal/mark-calibration-modal.component';
+} from '../list-view-modal/measurement-list-modal.component';
 
 @Component({
   selector: 'app-measurement-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, MarkCalibrationModalComponent],
+  imports: [CommonModule, FormsModule, RouterModule, MeasurementListModalComponent],
   templateUrl: './measurement-list.component.html',
   styleUrls: ['./measurement-list.component.scss']
 })
@@ -32,6 +31,7 @@ export class MeasurementListComponent implements OnInit {
   // Selection and modal
   selected = new Set<string>();
   modalOpen = false;
+  modalMeasurements: MeasurementSummaryDto[] = [];
 
   constructor(
     private api: MeasurementApiService,
@@ -72,29 +72,34 @@ export class MeasurementListComponent implements OnInit {
   }
 
   openMarkCalibrationModal(): void {
+    // Filter the full items list down to only the selected UUIDs.
+    this.modalMeasurements = this.items.filter(m => this.selected.has(m.uuid));
+    if (this.modalMeasurements.length === 0) return;
+
     this.modalOpen = true;
   }
 
   closeModal(): void {
     this.modalOpen = false;
+    this.modalMeasurements = [];
   }
 
-  onMarkCalibrationConfirm(result: MarkCalibrationResult): void {
-    const uuids = Array.from(this.selected);
-    if (uuids.length === 0) return;
-
+  // Receives an array from the modal — one result per row.
+  // Sends it as a single batch request to the backend.
+  onMarkCalibrationConfirm(results: MarkCalibrationResult[]): void {
     this.loading = true;
     this.modalOpen = false;
+    this.modalMeasurements = [];
 
-    const requests = uuids.map(uuid => this.api.markCalibration(uuid, result.payload));
-
-    forkJoin(requests).subscribe({
+    // Ein einziger API-Call für alle Messungen.
+    // Das Backend verarbeitet sie in einer Transaktion (all-or-nothing).
+    this.api.markCalibrationBatch(results).subscribe({
       next: () => {
         this.selected.clear();
         this.load();
       },
       error: (err) => {
-        this.error = 'Fehler beim Markieren als Kalibrierung.';
+        this.error = 'Error during marking as calibration.';
         this.loading = false;
         console.error(err);
       }

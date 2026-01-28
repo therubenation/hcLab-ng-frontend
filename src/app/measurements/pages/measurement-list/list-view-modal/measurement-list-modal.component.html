@@ -1,0 +1,115 @@
+<div class="modal-backdrop" (click)="onCancel()" aria-hidden="true"></div>
+
+<div
+  class="modal d-flex align-items-center justify-content-center"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="modal-title"
+>
+  <div class="card modal-card" (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="card-header d-flex align-items-center justify-content-between">
+      <h2 id="modal-title" class="modal-title">
+        Mark {{ rows.length }} measurement(s) as calibration
+      </h2>
+      <button
+        type="button"
+        class="btn btn-ghost"
+        aria-label="Close"
+        (click)="onCancel()"
+      >
+        ✕
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="card-body">
+
+      <!--
+        The table has two "zones" of columns:
+        - Left: read-only measurement info (UUID, date, batch codes)
+        - Right: editable form inputs (concentration, unit, label)
+
+        *ngFor iterates over `rows`. Each `row` is a CalibrationRow
+        containing both `row.measurement` (read-only data) and
+        `row.form` (editable form state). Because each row object
+        is a separate JS object, the [(ngModel)] bindings on each
+        row are fully independent — editing row 1 does not affect row 2.
+      -->
+      <div class="table-responsive">
+        <table class="table mb-0">
+          <thead>
+            <tr>
+              <!-- Read-only columns -->
+              <th>UUID</th>
+              <th>Date</th>
+              <th>BatchCode</th>
+              <th>ElectrodeBatchCode</th>
+              <!-- Editable columns -->
+              <th>Concentration</th>
+              <th>Unit</th>
+              <th>Replicate label</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of rows">
+              <!-- Read-only: bound to row.measurement -->
+              <td class="font-monospace">{{ row.measurement.uuid | slice:0:8 }}...</td>
+              <td>{{ row.measurement.startTime | date:'yyyy-MM-dd' }}</td>
+              <td class="font-monospace">{{ row.measurement.batchCode }}</td>
+              <td class="font-monospace">{{ row.measurement.electrodeBatchCode }}</td>
+
+              <!-- Editable: bound to row.form -->
+              <td>
+                <input
+                  type="number"
+                  class="form-control"
+                  placeholder="e.g. 100"
+                  [(ngModel)]="row.form.referenceConcentration"
+                />
+              </td>
+              <td>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="ng/mL"
+                  [(ngModel)]="row.form.referenceConcentrationUnit"
+                />
+              </td>
+              <td>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="optional"
+                  [(ngModel)]="row.form.replicateLabel"
+                />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="card-footer d-flex justify-content-end gap-2">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="onCancel()"
+      >
+        Cancel
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="onSubmit()"
+      >
+        Confirm
+      </button>
+    </div>
+
+  </div>
+</div>

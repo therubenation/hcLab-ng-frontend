@@ -62,7 +62,8 @@
               "buildTarget": "hormon-calculator-frontend:build:production"
             },
             "development": {
-              "buildTarget": "hormon-calculator-frontend:build:development"
+              "buildTarget": "hormon-calculator-frontend:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"

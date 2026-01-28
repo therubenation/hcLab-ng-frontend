@@ -3,7 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { MeasurementSummaryDto } from './dto/measurement-summary.dto';
 import { MeasurementDetailDto } from './dto/measurement-detail.dto';
-import {MarkCalibrationRequestDto} from './dto/mark-calibration-request.dto';
+import { MarkCalibrationRequestDto } from './dto/mark-calibration-request.dto';
+import { CalibrationBatchItemDto } from './dto/calibration-batch-item.dto';
 
 @Injectable({ providedIn: 'root' })
 export class MeasurementApiService {
@@ -23,6 +24,21 @@ export class MeasurementApiService {
     return this.http.patch<MeasurementDetailDto>(
       `${this.baseUrl}/${uuid}/mark-calibration`,
       payload
+    );
+  }
+
+  /**
+   * Batch-Endpoint: Markiert mehrere Messungen als Kalibrierung in einer Transaktion.
+   *
+   * Vorteile gegenüber N einzelnen Calls:
+   * - Ein Roundtrip statt N
+   * - Atomarität: alle oder keine werden markiert
+   * - Semantisch klar: "diese Messungen gehören zu einer Kalibrieraktion"
+   */
+  markCalibrationBatch(items: CalibrationBatchItemDto[]): Observable<void> {
+    return this.http.patch<void>(
+      `${this.baseUrl}/calibration-batch`,
+      items
     );
   }
 }
