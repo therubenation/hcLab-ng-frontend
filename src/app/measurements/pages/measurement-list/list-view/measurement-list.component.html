@@ -70,7 +70,7 @@
           <button
             class="nav-link"
             [class.active]="activeTab === 'ALL'"
-            (click)="activeTab = 'ALL'"
+            (click)="switchTab('ALL')"
             type="button"
           >
             All
@@ -80,7 +80,7 @@
           <button
             class="nav-link"
             [class.active]="activeTab === 'STANDARD'"
-            (click)="activeTab = 'STANDARD'"
+            (click)="switchTab('STANDARD')"
             type="button"
           >
             Standard
@@ -90,7 +90,7 @@
           <button
             class="nav-link"
             [class.active]="activeTab === 'CALIBRATION'"
-            (click)="activeTab = 'CALIBRATION'"
+            (click)="switchTab('CALIBRATION')"
             type="button"
           >
             Calibration
@@ -106,14 +106,26 @@
       {{ selected.size }} selected
     </span>
     <span *ngIf="selected.size === 0"></span>
-    <button
-      type="button"
-      class="btn btn-primary"
-      [disabled]="selected.size === 0"
-      (click)="openMarkCalibrationModal()"
-    >
-      Mark selected as calibration...
-    </button>
+    <div class="d-flex gap-2">
+      <button
+        *ngIf="activeTab === 'STANDARD' || activeTab === 'ALL'"
+        type="button"
+        class="btn btn-primary"
+        [disabled]="selectedStandardCount === 0"
+        (click)="openMarkCalibrationModal()"
+      >
+        Mark selected as calibration...
+      </button>
+      <button
+        *ngIf="activeTab === 'CALIBRATION' || activeTab === 'ALL'"
+        type="button"
+        class="btn btn-warning"
+        [disabled]="selectedCalibrationCount === 0"
+        (click)="confirmRevertToStandard()"
+      >
+        Revert selected to standard...
+      </button>
+    </div>
   </div>
 
   <!-- Table -->
@@ -137,7 +149,7 @@
               <input
                 type="checkbox"
                 class="form-check-input"
-                [disabled]="m.measurementType !== 'STANDARD'"
+                [disabled]="!isSelectable(m)"
                 [checked]="selected.has(m.uuid)"
                 (click)="$event.stopPropagation()"
                 (keydown)="$event.stopPropagation()"

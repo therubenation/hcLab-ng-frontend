@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { MeasurementApiService } from '../../../measurement-api.service';
 import { MeasurementSummaryDto } from '../../../dto/measurement-summary.dto';
+import { CalibrationBatchItemDto } from '../../../dto/calibration-batch-item.dto';
 import {
   MeasurementListModalComponent,
   MarkCalibrationResult
@@ -63,6 +64,11 @@ export class MeasurementListComponent implements OnInit {
     this.router.navigate(['/measurements', uuid]);
   }
 
+  switchTab(tab: 'ALL' | 'STANDARD' | 'CALIBRATION'): void {
+    this.activeTab = tab;
+    this.selected.clear();
+  }
+
   toggleSelection(uuid: string, checked: boolean): void {
     if (checked) {
       this.selected.add(uuid);
@@ -71,12 +77,69 @@ export class MeasurementListComponent implements OnInit {
     }
   }
 
+  isSelectable(m: MeasurementSummaryDto): boolean {
+    switch (this.activeTab) {
+      case 'STANDARD': return m.measurementType === 'STANDARD';
+      case 'CALIBRATION': return m.measurementType === 'CALIBRATION';
+      case 'ALL': return true;
+    }
+  }
+
+  get selectedStandardCount(): number {
+    return this.items.filter(
+      m => this.selected.has(m.uuid) && m.measurementType === 'STANDARD'
+    ).length;
+  }
+
+  get selectedCalibrationCount(): number {
+    return this.items.filter(
+      m => this.selected.has(m.uuid) && m.measurementType === 'CALIBRATION'
+    ).length;
+  }
+
   openMarkCalibrationModal(): void {
-    // Filter the full items list down to only the selected UUIDs.
-    this.modalMeasurements = this.items.filter(m => this.selected.has(m.uuid));
+    this.modalMeasurements = this.items.filter(
+      m => this.selected.has(m.uuid) && m.measurementType === 'STANDARD'
+    );
     if (this.modalMeasurements.length === 0) return;
 
     this.modalOpen = true;
+  }
+
+  confirmRevertToStandard(): void {
+    const calibrationItems = this.items.filter(
+      m => this.selected.has(m.uuid) && m.measurementType === 'CALIBRATION'
+    );
+    if (calibrationItems.length === 0) return;
+
+    const ok = confirm(
+      `Revert ${calibrationItems.length} measurement(s) to STANDARD?\n\n` +
+      'Calibration data (reference concentration, unit, replicate label) will be removed.'
+    );
+    if (!ok) return;
+
+    const batch: CalibrationBatchItemDto[] = calibrationItems.map(m => ({
+      uuid: m.uuid,
+      payload: {
+        calibration: false,
+        referenceConcentration: null,
+        referenceConcentrationUnit: null,
+        replicateLabel: null
+      }
+    }));
+
+    this.loading = true;
+    this.api.markCalibrationBatch(batch).subscribe({
+      next: () => {
+        this.selected.clear();
+        this.load();
+      },
+      error: (err) => {
+        this.error = 'Error reverting to standard.';
+        this.loading = false;
+        console.error(err);
+      }
+    });
   }
 
   closeModal(): void {
