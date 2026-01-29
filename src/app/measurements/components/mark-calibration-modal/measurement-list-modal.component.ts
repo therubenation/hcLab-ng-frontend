@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MeasurementSummaryDto } from '../../../dto/measurement-summary.dto';
-import { MarkCalibrationRequestDto } from '../../../dto/mark-calibration-request.dto';
+import { MeasurementSummaryDto } from '../../dto/measurement-summary.dto';
+import { MarkCalibrationRequestDto } from '../../dto/mark-calibration-request.dto';
 
 // Each row pairs a measurement with its own editable form state.
 // This is the internal structure the modal works with.

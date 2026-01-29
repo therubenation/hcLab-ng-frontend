@@ -8,7 +8,7 @@ import { CalibrationBatchItemDto } from '../../../dto/calibration-batch-item.dto
 import {
   MeasurementListModalComponent,
   MarkCalibrationResult
-} from '../list-view-modal/measurement-list-modal.component';
+} from '../../../components/mark-calibration-modal/measurement-list-modal.component';
 
 @Component({
   selector: 'app-measurement-list',
