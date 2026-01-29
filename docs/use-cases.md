@@ -84,8 +84,6 @@ Der Wissenschaftler wählt in der Messübersicht eine oder mehrere Messungen aus
   - `measurementType = CALIBRATION`
   - `referenceConcentration`, `referenceUnit`  
     (Pflicht bei `CALIBRATION`)
-  - `includedInCalibration`  
-    (Default: true oder false – Designentscheidung)
 - Rückgängig machen ist möglich:
   - `measurementType = STANDARD`
   - Referenzfelder werden gelöscht oder ignoriert
