@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Chart, ChartConfiguration } from 'chart.js/auto';
 
@@ -10,8 +10,9 @@ import {RawSignalPayloadV1} from '../../dto/raw-signal.dto';
 @Component({
   selector: 'app-measurement-detail',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './measurement-detail.component.html',
+  styleUrls: ['./measurement-detail.component.scss'],
 })
 export class MeasurementDetailComponent implements OnInit, OnDestroy {
   @ViewChild('signalCanvas', { static: false }) canvas?: ElementRef<HTMLCanvasElement>;

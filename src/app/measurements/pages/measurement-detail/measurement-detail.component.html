@@ -1,60 +1,186 @@
-<h2>Messung Detail</h2>
+<!-- Status messages -->
+<div *ngIf="loading" class="alert alert-info">Loading...</div>
+<div *ngIf="!loading && error" class="alert alert-danger">{{ error }}</div>
 
-<div *ngIf="loading">Lade...</div>
-<div *ngIf="error">{{ error }}</div>
+<section *ngIf="measurement && !loading && !error" class="container py-3">
 
-<div *ngIf="measurement && !loading && !error">
-  <p><b>UUID:</b> {{ measurement.uuid }}</p>
-  <p><b>Start:</b> {{ measurement.startTime | date:'short' }}</p>
-  <p><b>Rolle:</b> {{ measurement.performedByRole }}</p>
-
-  <hr />
-
-  <h3>Raw Signal</h3>
-
-  <div *ngIf="!rawSignal">
-    Raw-Signal konnte nicht geparst werden oder hat falsches Format.
+  <!-- Breadcrumb / Back -->
+  <div class="d-flex align-items-center gap-2 mb-3">
+    <a routerLink="/measurements" class="link">&larr; Back</a>
+    <span class="text-muted">Measurements / Detail</span>
   </div>
 
-  <div *ngIf="rawSignal">
-    <p>
-      <b>X:</b> {{ rawSignal.xUnit }}
-      &nbsp;|&nbsp;
-      <b>Y:</b> {{ rawSignal.yUnit }}
-      &nbsp;|&nbsp;
-      <b>Punkte:</b> {{ rawSignal.points.length }}
-    </p>
-
-    <!-- Minimal: erstmal nur Tabelle / Debug -->
-    <table>
-      <thead>
-      <tr><th>x</th><th>y</th></tr>
-      </thead>
-      <tbody>
-      <tr *ngFor="let p of rawSignal.points | slice:0:20">
-        <td>{{ p.x }}</td>
-        <td>{{ p.y }}</td>
-      </tr>
-      </tbody>
-    </table>
-
-    <p *ngIf="rawSignal.points.length > 20">
-      (zeige nur die ersten 20 Punkte)
-    </p>
+  <!-- Page title + type badge -->
+  <div class="d-flex align-items-center gap-2 mb-4">
+    <h1 class="page-title">Measurement</h1>
+    <span
+      class="badge badge-pill"
+      [ngClass]="{
+        'badge-warning': measurement.measurementType === 'CALIBRATION',
+        'badge-info':    measurement.measurementType !== 'CALIBRATION'
+      }"
+    >
+      {{ measurement.measurementType || 'STANDARD' }}
+    </span>
   </div>
-  <div *ngIf="measurement as m; else loading">
-    <h2>Measurement {{ m.uuid }}</h2>
 
-    <div style="height: 380px; margin-top: 16px;">
-      <canvas #signalCanvas *ngIf="rawSignal; else noSignal"></canvas>
-      <ng-template #noSignal>
-        <p>Kein Rohsignal vorhanden oder ungültiges Format.</p>
-      </ng-template>
+  <!-- Metadata card -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <span class="section-title">Measurement Details</span>
+    </div>
+    <div class="card-body">
+      <div class="meta-grid">
+
+        <!-- Identification -->
+        <div class="meta-item">
+          <span class="meta-label">UUID</span>
+          <span class="meta-value mono">{{ measurement.uuid }}</span>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-label">Measurement Type</span>
+          <span class="meta-value">{{ measurement.measurementType || '—' }}</span>
+        </div>
+
+        <!-- Timing -->
+        <div class="meta-item">
+          <span class="meta-label">Start Time</span>
+          <span class="meta-value">{{ measurement.startTime | date:'yyyy-MM-dd HH:mm:ss' }}</span>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-label">End Time</span>
+          <span class="meta-value">{{ measurement.endTime ? (measurement.endTime | date:'yyyy-MM-dd HH:mm:ss') : '—' }}</span>
+        </div>
+
+        <!-- Operator -->
+        <div class="meta-item">
+          <span class="meta-label">Operator Email</span>
+          <span class="meta-value">{{ measurement.operatorEmail || '—' }}</span>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-label">Performed By Role</span>
+          <span class="meta-value">{{ measurement.performedByRole || '—' }}</span>
+        </div>
+
+        <!-- Device -->
+        <div class="meta-item">
+          <span class="meta-label">Device Serial</span>
+          <span class="meta-value mono">{{ measurement.deviceSerial || '—' }}</span>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-label">Device Model</span>
+          <span class="meta-value">{{ measurement.deviceModel || '—' }}</span>
+        </div>
+
+        <!-- Batch / Cartridge -->
+        <div class="meta-item">
+          <span class="meta-label">Batch Code</span>
+          <span class="meta-value mono">{{ measurement.batchCode || '—' }}</span>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-label">Cartridge Product Code</span>
+          <span class="meta-value mono">{{ measurement.cartridgeProductCode || '—' }}</span>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-label">Electrode Batch Code</span>
+          <span class="meta-value mono">{{ measurement.electrodeBatchCode || '—' }}</span>
+        </div>
+
+        <!-- Hormone -->
+        <div class="meta-item">
+          <span class="meta-label">Hormone</span>
+          <span class="meta-value">{{ measurement.hormoneName || '—' }}</span>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-label">Hormone Unit</span>
+          <span class="meta-value">{{ measurement.hormoneUnit || '—' }}</span>
+        </div>
+
+        <!-- Test Protocol -->
+        <div class="meta-item">
+          <span class="meta-label">Test Protocol ID</span>
+          <span class="meta-value">{{ measurement.testProtocolId ?? '—' }}</span>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-label">Test Method</span>
+          <span class="meta-value">{{ measurement.testMethod || '—' }}</span>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-label">Test Protocol Version</span>
+          <span class="meta-value">{{ measurement.testProtocolVersion || '—' }}</span>
+        </div>
+
+      </div>
     </div>
   </div>
 
-  <ng-template #loading>
-    <p>Lade Messung…</p>
-  </ng-template>
+  <!-- Calibration card (conditional) -->
+  <div
+    *ngIf="measurement.measurementType === 'CALIBRATION'"
+    class="card mb-4"
+  >
+    <div class="card-header">
+      <span class="section-title">Calibration Data</span>
+    </div>
+    <div class="card-body">
+      <div class="meta-grid">
 
-</div>
+        <div class="meta-item">
+          <span class="meta-label">Reference Concentration</span>
+          <span class="meta-value">{{ measurement.referenceConcentration ?? '—' }}</span>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-label">Concentration Unit</span>
+          <span class="meta-value">{{ measurement.referenceConcentrationUnit || '—' }}</span>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-label">Replicate Label</span>
+          <span class="meta-value">{{ measurement.replicateLabel || '—' }}</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Effective Parameters (if present) -->
+  <div *ngIf="measurement.effectiveParameters" class="card mb-4">
+    <div class="card-header">
+      <span class="section-title">Effective Parameters</span>
+    </div>
+    <div class="card-body">
+      <pre class="font-mono" style="margin:0; white-space:pre-wrap; word-break:break-all;">{{ measurement.effectiveParameters }}</pre>
+    </div>
+  </div>
+
+  <!-- Raw Signal Chart card -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <span class="section-title">Raw Signal</span>
+      <span *ngIf="rawSignal" class="text-muted" style="margin-left: 12px; font-weight: 400;">
+        {{ rawSignal.points.length }} points &middot;
+        X: {{ rawSignal.xUnit }} &middot;
+        Y: {{ rawSignal.yUnit }}
+      </span>
+    </div>
+    <div class="card-body">
+      <div *ngIf="!rawSignal" class="alert alert-warning mb-0">
+        Raw signal could not be parsed or has an unsupported format.
+      </div>
+      <div *ngIf="rawSignal" class="chart-container">
+        <canvas #signalCanvas></canvas>
+      </div>
+    </div>
+  </div>
+
+</section>

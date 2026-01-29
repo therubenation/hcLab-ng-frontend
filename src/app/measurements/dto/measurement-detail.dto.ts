@@ -5,12 +5,35 @@ export interface MeasurementDetailDto {
   performedByRole: string;
   effectiveParameters?: string | null;
 
-  // kommt vom Backend aktuell als String:
+  // Raw signal (comes from backend as JSON string)
   rawSignalJson: string;
 
-  // bisschen Kontext
-  deviceSerial?: string;
-  batchCode?: string;
-  electrodeBatchCode?: string;
-  testProtocol?: { id: number; description: string; version: string };
+  // Measurement classification
+  measurementType?: string | null;
+
+  // Calibration-specific fields
+  referenceConcentration?: number | null;
+  referenceConcentrationUnit?: string | null;
+  replicateLabel?: string | null;
+
+  // Device context
+  deviceSerial?: string | null;
+  deviceModel?: string | null;
+
+  // Cartridge / batch context
+  batchCode?: string | null;
+  cartridgeProductCode?: string | null;
+  electrodeBatchCode?: string | null;
+
+  // Hormone
+  hormoneName?: string | null;
+  hormoneUnit?: string | null;
+
+  // Test protocol (flat fields matching backend record)
+  testProtocolId?: number | null;
+  testMethod?: string | null;
+  testProtocolVersion?: string | null;
+
+  // Operator
+  operatorEmail?: string | null;
 }
