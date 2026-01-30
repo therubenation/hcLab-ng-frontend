@@ -1,3 +1,16 @@
+
+export interface AnalysisResultDto {
+  source?: string | null;
+  analysisVersion?: string | null;
+  peakCurrent?: number | null;
+  peakCurrentUnit?: string | null;
+  peakPotential?: number | null;
+  peakPotentialUnit?: string | null;
+  concentrationValue?: number | null;
+  concentrationUnit?: string | null;
+  qualityScore?: number | null;
+}
+
 export interface MeasurementDetailDto {
   uuid: string;
   startTime: string;
@@ -36,4 +49,10 @@ export interface MeasurementDetailDto {
 
   // Operator
   operatorEmail?: string | null;
+
+  // AnaylsisResult
+  analysisResult?: AnalysisResultDto | null;
+
 }
+
+

@@ -123,6 +123,60 @@
     </div>
   </div>
 
+
+  <div class="card mb-4" *ngIf="measurement.analysisResult as ar; else noAnalysis">
+    <div class="card-header">
+      <span class="section-title">Analysis Results</span>
+    </div>
+    <div class="card-body">
+      <div class="meta-grid">
+
+        <div class="meta-item">
+          <span class="meta-label">Peak Current</span>
+          <span class="meta-value">{{ ar.peakCurrent ?? '—' }} {{ ar.peakCurrentUnit || '' }}</span>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-label">Peak Potential</span>
+          <span class="meta-value">{{ ar.peakPotential ?? '—' }} {{ ar.peakPotentialUnit || '' }}</span>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-label">Concentration</span>
+          <span class="meta-value">{{ ar.concentrationValue ?? '—' }} {{ ar.concentrationUnit || '' }}</span>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-label">Analysis Source</span>
+          <span class="meta-value">{{ ar.source || '—' }}</span>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-label">Analysis Version</span>
+          <span class="meta-value">{{ ar.analysisVersion || '—' }}</span>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-label">Quality Score</span>
+          <span class="meta-value">{{ ar.qualityScore ?? '—' }}</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <ng-template #noAnalysis>
+    <div class="card mb-4">
+      <div class="card-header">
+        <span class="section-title">Analysis Results</span>
+      </div>
+      <div class="card-body">
+        <div class="alert alert-warning mb-0">No analysis result available.</div>
+      </div>
+    </div>
+  </ng-template>
+
+
   <!-- Calibration card (conditional) -->
   <div
     *ngIf="measurement.measurementType === 'CALIBRATION'"
@@ -152,6 +206,8 @@
       </div>
     </div>
   </div>
+
+
 
   <!-- Effective Parameters (if present) -->
   <div *ngIf="measurement.effectiveParameters" class="card mb-4">

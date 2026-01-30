@@ -35,6 +35,10 @@ export class MeasurementDetailComponent implements OnInit, OnDestroy {
 
     this.api.getByUuid(uuid).subscribe({
       next: (m) => {
+
+        console.log('measurement detail response:', m);
+        console.log('analysisResult:', (m as any).analysisResult);
+
         this.measurement = m;
         this.rawSignal = this.parseRawSignal(m.rawSignalJson);
         this.loading = false;

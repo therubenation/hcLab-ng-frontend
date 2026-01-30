@@ -55,7 +55,7 @@ export class MeasurementListComponent implements OnInit {
         this.loading = false;
       },
       error: (err) => {
-        this.error = 'Konnte Messungen nicht laden.';
+        this.error = 'Could not load measurements.';
         this.loading = false;
         console.error(err);
       }
