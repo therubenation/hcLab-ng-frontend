@@ -5,6 +5,7 @@ import { MeasurementSummaryDto } from './dto/measurement-summary.dto';
 import { MeasurementDetailDto } from './dto/measurement-detail.dto';
 import { MarkCalibrationRequestDto } from './dto/mark-calibration-request.dto';
 import { CalibrationBatchItemDto } from './dto/calibration-batch-item.dto';
+import { SetInclusionRequestDto } from './dto/set-inclusion-request.dto';
 
 @Injectable({ providedIn: 'root' })
 export class MeasurementApiService {
@@ -39,6 +40,13 @@ export class MeasurementApiService {
     return this.http.patch<void>(
       `${this.baseUrl}/calibration-batch`,
       items
+    );
+  }
+
+  setInclusion(uuid: string, included: boolean): Observable<void> {
+    return this.http.patch<void>(
+      `${this.baseUrl}/${uuid}/inclusion`,
+      { includedInCalibration: included } as SetInclusionRequestDto
     );
   }
 }

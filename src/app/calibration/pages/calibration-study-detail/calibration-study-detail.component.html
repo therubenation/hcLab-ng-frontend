@@ -73,6 +73,20 @@
         {{ group.measurements.length }} measurement(s)
       </span>
     </div>
+    <div class="stats-row">
+      <div class="stat-item">
+        <span class="stat-label">Included</span>
+        <span class="stat-value">{{ group.includedCount }}</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Mean Peak Current</span>
+        <span class="stat-value">{{ group.meanPeakCurrent != null ? group.meanPeakCurrent : '—' }}</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Std Dev Peak Current</span>
+        <span class="stat-value">{{ group.stddevPeakCurrent != null ? group.stddevPeakCurrent : '—' }}</span>
+      </div>
+    </div>
     <div class="card-body p-0">
       <div class="table-responsive">
         <table class="table table-hover mb-0">
@@ -111,17 +125,66 @@
                 <span *ngIf="m.concentrationValue != null">{{ m.concentrationValue }}</span>
                 <span *ngIf="m.concentrationValue == null" class="text-muted">—</span>
               </td>
-              <td>
-                <span
-                  class="badge"
-                  [ngClass]="m.includedInCalibration ? 'badge-success' : 'badge-muted'"
-                >
-                  {{ m.includedInCalibration ? 'Yes' : 'No' }}
-                </span>
+              <td (click)="$event.stopPropagation()">
+                <label class="toggle-label">
+                  <input
+                    type="checkbox"
+                    [checked]="m.includedInCalibration"
+                    [disabled]="togglingUuid !== null"
+                    (change)="toggleInclusion(m.uuid, m.includedInCalibration, $event)"
+                  />
+                  <span
+                    class="badge"
+                    [ngClass]="m.includedInCalibration ? 'badge-success' : 'badge-muted'"
+                  >
+                    {{ m.includedInCalibration ? 'Yes' : 'No' }}
+                  </span>
+                </label>
               </td>
             </tr>
           </tbody>
         </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calibration Curve section -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <span class="section-title">Calibration Curve</span>
+    </div>
+    <div class="card-body">
+      <button
+        class="btn btn-primary"
+        [disabled]="!study || !hasIncludedMeasurements || computingCurve"
+        (click)="computeCurve()"
+      >
+        {{ computingCurve ? 'Computing...' : 'Compute calibration curve' }}
+      </button>
+
+      <div *ngIf="curveError" class="alert alert-danger" style="margin-top: 12px;">
+        {{ curveError }}
+      </div>
+
+      <div *ngIf="curveResult" class="curve-result">
+        <div class="meta-grid">
+          <div class="meta-item">
+            <span class="meta-label">Curve ID</span>
+            <span class="meta-value">{{ curveResult.curveId }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Model Type</span>
+            <span class="meta-value">{{ curveResult.curveModelType }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Valid From</span>
+            <span class="meta-value">{{ curveResult.validFrom | date:'yyyy-MM-dd HH:mm:ss' }}</span>
+          </div>
+        </div>
+        <div style="margin-top: 12px;">
+          <span class="meta-label">Curve Data</span>
+          <pre class="curve-data-pre">{{ formattedCurveData }}</pre>
+        </div>
       </div>
     </div>
   </div>

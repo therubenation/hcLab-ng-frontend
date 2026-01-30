@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { CalibrationStudySummaryDto } from './dto/calibration-study-summary.dto';
 import { CalibrationStudyDetailDto } from './dto/calibration-study-detail.dto';
 import { CreateCalibrationStudyRequest } from './dto/create-calibration-study-request.dto';
+import { ComputeCurveResponseDto } from './dto/compute-curve-response.dto';
 
 @Injectable({ providedIn: 'root' })
 export class CalibrationStudyApiService {
@@ -21,5 +22,11 @@ export class CalibrationStudyApiService {
 
   create(request: CreateCalibrationStudyRequest): Observable<CalibrationStudySummaryDto> {
     return this.http.post<CalibrationStudySummaryDto>(this.baseUrl, request);
+  }
+
+  computeCurve(uuid: string): Observable<ComputeCurveResponseDto> {
+    return this.http.post<ComputeCurveResponseDto>(
+      `${this.baseUrl}/${uuid}/compute-curve`, {}
+    );
   }
 }

@@ -10,6 +10,9 @@ export interface CalibrationStudyDetailDto {
 export interface ConcentrationGroupDto {
   referenceConcentration: number;
   referenceConcentrationUnit: string;
+  includedCount: number;
+  meanPeakCurrent: number | null;
+  stddevPeakCurrent: number | null;
   measurements: StudyMeasurementDto[];
 }
 
