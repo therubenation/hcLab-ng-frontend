@@ -154,6 +154,15 @@
   background: #1d4ed8;
 }
 
+.btn-success {
+  background: #22c55e;
+  color: #fff;
+}
+
+.btn-success:hover:not(:disabled) {
+  background: #16a34a;
+}
+
 .btn-warning {
   background: #f59e0b;
   color: #fff;

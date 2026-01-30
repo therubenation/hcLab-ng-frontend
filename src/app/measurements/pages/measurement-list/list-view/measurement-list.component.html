@@ -119,6 +119,15 @@
       <button
         *ngIf="activeTab === 'CALIBRATION' || activeTab === 'ALL'"
         type="button"
+        class="btn btn-success"
+        [disabled]="selectedCalibrationCount === 0"
+        (click)="createCalibrationStudy()"
+      >
+        Create calibration study from selection...
+      </button>
+      <button
+        *ngIf="activeTab === 'CALIBRATION' || activeTab === 'ALL'"
+        type="button"
         class="btn btn-warning"
         [disabled]="selectedCalibrationCount === 0"
         (click)="confirmRevertToStandard()"

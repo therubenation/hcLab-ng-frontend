@@ -59,8 +59,9 @@ Rohdaten und Kontext einer Messung analysieren.
 - Messart (Standard / Kalibrierung)
 - Falls Kalibrierung:
   - Sollkonzentration + Einheit
-  - Flag `includedInCalibration`
 - `cartridgeInstanceCode` (falls gesetzt)
+- Datum
+- Operator: email
 
 ---
 

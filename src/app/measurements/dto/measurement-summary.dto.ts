@@ -9,4 +9,5 @@ export interface MeasurementSummaryDto {
   deviceSerial: string | null;
   testProtocolId: number | null;
   measurementType: string | null;
+  replicateLabel: string | null;
 }

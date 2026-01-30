@@ -1,0 +1,134 @@
+<!-- Status messages -->
+<div *ngIf="loading" class="alert alert-info">Loading...</div>
+<div *ngIf="!loading && error" class="alert alert-danger">{{ error }}</div>
+
+<section *ngIf="study && !loading && !error" class="container py-3">
+
+  <!-- Breadcrumb / Back -->
+  <div class="d-flex align-items-center gap-2 mb-3">
+    <a routerLink="/measurements" class="link">&larr; Back to Measurements</a>
+    <span class="text-muted">Calibration / Study</span>
+  </div>
+
+  <!-- Page title -->
+  <div class="d-flex align-items-center gap-2 mb-4">
+    <h1 class="page-title">Calibration Study</h1>
+    <span class="badge badge-pill badge-info">
+      {{ totalMeasurements }} measurements
+    </span>
+  </div>
+
+  <!-- Metadata card -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <span class="section-title">Study Details</span>
+    </div>
+    <div class="card-body">
+      <div class="meta-grid">
+
+        <div class="meta-item">
+          <span class="meta-label">Context</span>
+          <span class="meta-value">{{ study.context }}</span>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-label">UUID</span>
+          <span class="meta-value mono">{{ study.uuid }}</span>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-label">Created At</span>
+          <span class="meta-value">{{ study.createdAt | date:'yyyy-MM-dd HH:mm:ss' }}</span>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-label">Electrode Batch Code</span>
+          <span class="meta-value mono">{{ study.electrodeBatchCode }}</span>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-label">Test Protocol ID</span>
+          <span class="meta-value">{{ study.testProtocolId }}</span>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-label">Concentration Groups</span>
+          <span class="meta-value">{{ study.concentrationGroups.length }}</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Concentration groups -->
+  <div
+    *ngFor="let group of study.concentrationGroups; let i = index"
+    class="card mb-3"
+  >
+    <div class="card-header">
+      <span class="section-title">
+        {{ group.referenceConcentration }} {{ group.referenceConcentrationUnit }}
+      </span>
+      <span class="text-muted" style="margin-left: 12px; font-weight: 400;">
+        {{ group.measurements.length }} measurement(s)
+      </span>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>UUID</th>
+              <th>Date</th>
+              <th>Replicate</th>
+              <th>Batch Code</th>
+              <th>Device</th>
+              <th>Peak Current</th>
+              <th>Concentration</th>
+              <th>Included</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let m of group.measurements"
+              (click)="openMeasurement(m.uuid)"
+              (keydown.enter)="openMeasurement(m.uuid)"
+              tabindex="0"
+              style="cursor: pointer;"
+            >
+              <td class="font-mono">{{ m.uuid | slice:0:8 }}...</td>
+              <td>{{ m.startTime | date:'yyyy-MM-dd' }}</td>
+              <td>{{ m.replicateLabel || '—' }}</td>
+              <td class="font-mono">{{ m.batchCode }}</td>
+              <td class="font-mono">{{ m.deviceSerial }}</td>
+              <td>
+                <span *ngIf="m.peakCurrent != null">
+                  {{ m.peakCurrent }} {{ m.peakCurrentUnit || '' }}
+                </span>
+                <span *ngIf="m.peakCurrent == null" class="text-muted">—</span>
+              </td>
+              <td>
+                <span *ngIf="m.concentrationValue != null">{{ m.concentrationValue }}</span>
+                <span *ngIf="m.concentrationValue == null" class="text-muted">—</span>
+              </td>
+              <td>
+                <span
+                  class="badge"
+                  [ngClass]="m.includedInCalibration ? 'badge-success' : 'badge-muted'"
+                >
+                  {{ m.includedInCalibration ? 'Yes' : 'No' }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="study.concentrationGroups.length === 0" class="alert alert-warning">
+    No measurements are linked to this calibration study.
+  </div>
+
+</section>

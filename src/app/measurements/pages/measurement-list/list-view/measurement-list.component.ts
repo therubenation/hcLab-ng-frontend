@@ -9,6 +9,7 @@ import {
   MeasurementListModalComponent,
   MarkCalibrationResult
 } from '../../../components/mark-calibration-modal/measurement-list-modal.component';
+import { CalibrationStudyApiService } from '../../../../calibration/calibration-study-api.service';
 
 @Component({
   selector: 'app-measurement-list',
@@ -36,6 +37,7 @@ export class MeasurementListComponent implements OnInit {
 
   constructor(
     private api: MeasurementApiService,
+    private calibrationStudyApi: CalibrationStudyApiService,
     private router: Router
   ) {}
 
@@ -136,6 +138,33 @@ export class MeasurementListComponent implements OnInit {
       },
       error: (err) => {
         this.error = 'Error reverting to standard.';
+        this.loading = false;
+        console.error(err);
+      }
+    });
+  }
+
+  createCalibrationStudy(): void {
+    const calibrationUuids = this.items
+      .filter(m => this.selected.has(m.uuid) && m.measurementType === 'CALIBRATION')
+      .map(m => m.uuid);
+
+    if (calibrationUuids.length === 0) return;
+
+    const context = prompt('Enter a description for this calibration study:');
+    if (!context?.trim()) return;
+
+    this.loading = true;
+    this.calibrationStudyApi.create({
+      context: context.trim(),
+      measurementUuids: calibrationUuids
+    }).subscribe({
+      next: (study) => {
+        this.selected.clear();
+        this.router.navigate(['/calibration-studies', study.uuid]);
+      },
+      error: (err) => {
+        this.error = err.error?.message || 'Error creating calibration study.';
         this.loading = false;
         console.error(err);
       }
