@@ -99,7 +99,17 @@
               <th>Device</th>
               <th>Peak Current</th>
               <th>Concentration</th>
-              <th>Included</th>
+              <th>
+                <label class="toggle-label">
+                  <input
+                    type="checkbox"
+                    [checked]="isGroupAllIncluded(group)"
+                    [disabled]="togglingAll || togglingUuid !== null"
+                    (change)="toggleAllInGroup(group, $event)"
+                  />
+                  Included
+                </label>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -130,7 +140,7 @@
                   <input
                     type="checkbox"
                     [checked]="m.includedInCalibration"
-                    [disabled]="togglingUuid !== null"
+                    [disabled]="togglingUuid !== null || togglingAll"
                     (change)="toggleInclusion(m.uuid, m.includedInCalibration, $event)"
                   />
                   <span
@@ -159,11 +169,15 @@
         [disabled]="!study || !hasIncludedMeasurements || computingCurve"
         (click)="computeCurve()"
       >
-        {{ computingCurve ? 'Computing...' : 'Compute calibration curve' }}
+        {{ computingCurve ? 'Saving...' : 'Compute &amp; save calibration curve' }}
       </button>
 
       <div *ngIf="curveError" class="alert alert-danger" style="margin-top: 12px;">
         {{ curveError }}
+      </div>
+
+      <div *ngIf="curveSuccess" class="alert alert-success" style="margin-top: 12px;">
+        Calibration curve saved successfully.
       </div>
 
       <div *ngIf="curveResult" class="curve-result">

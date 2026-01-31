@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { forkJoin } from 'rxjs';
 import { CalibrationStudyApiService } from '../../calibration-study-api.service';
-import { CalibrationStudyDetailDto } from '../../dto/calibration-study-detail.dto';
+import { CalibrationStudyDetailDto, ConcentrationGroupDto } from '../../dto/calibration-study-detail.dto';
 import { ComputeCurveResponseDto } from '../../dto/compute-curve-response.dto';
 import { MeasurementApiService } from '../../../measurements/measurement-api.service';
 
@@ -20,9 +21,11 @@ export class CalibrationStudyDetailComponent implements OnInit {
 
   private studyUuid: string | null = null;
   togglingUuid: string | null = null;
+  togglingAll = false;
   computingCurve = false;
   curveResult: ComputeCurveResponseDto | null = null;
   curveError: string | null = null;
+  curveSuccess = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -66,7 +69,7 @@ export class CalibrationStudyDetailComponent implements OnInit {
 
   toggleInclusion(uuid: string, currentValue: boolean, event: Event): void {
     event.stopPropagation();
-    if (this.togglingUuid !== null) return;
+    if (this.togglingUuid !== null || this.togglingAll) return;
 
     this.togglingUuid = uuid;
     this.measurementApi.setInclusion(uuid, !currentValue).subscribe({
@@ -81,15 +84,47 @@ export class CalibrationStudyDetailComponent implements OnInit {
     });
   }
 
+  isGroupAllIncluded(group: ConcentrationGroupDto): boolean {
+    return group.measurements.length > 0
+      && group.measurements.every(m => m.includedInCalibration);
+  }
+
+  toggleAllInGroup(group: ConcentrationGroupDto, event: Event): void {
+    event.stopPropagation();
+    if (this.togglingAll || this.togglingUuid !== null) return;
+    if (group.measurements.length === 0) return;
+
+    const targetValue = !this.isGroupAllIncluded(group);
+    const toToggle = group.measurements.filter(m => m.includedInCalibration !== targetValue);
+    if (toToggle.length === 0) return;
+
+    this.togglingAll = true;
+    forkJoin(
+      toToggle.map(m => this.measurementApi.setInclusion(m.uuid, targetValue))
+    ).subscribe({
+      next: () => {
+        this.togglingAll = false;
+        this.loadStudy();
+      },
+      error: (err) => {
+        this.togglingAll = false;
+        console.error('Failed to toggle group inclusions', err);
+        this.loadStudy();
+      }
+    });
+  }
+
   computeCurve(): void {
     if (!this.studyUuid || this.computingCurve) return;
 
     this.computingCurve = true;
     this.curveError = null;
+    this.curveSuccess = false;
     this.api.computeCurve(this.studyUuid).subscribe({
       next: (result) => {
         this.curveResult = result;
         this.computingCurve = false;
+        this.curveSuccess = true;
       },
       error: (err) => {
         this.curveError = 'Failed to compute calibration curve.';

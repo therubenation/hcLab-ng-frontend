@@ -96,12 +96,22 @@
             Calibration
           </button>
         </li>
+        <li class="nav-item">
+          <button
+            class="nav-link"
+            [class.active]="activeTab === 'STUDIES'"
+            (click)="switchTab('STUDIES')"
+            type="button"
+          >
+            Studies
+          </button>
+        </li>
       </ul>
     </div>
   </div>
 
   <!-- Table action bar -->
-  <div class="d-flex justify-content-between align-items-center mb-2">
+  <div *ngIf="activeTab !== 'STUDIES'" class="d-flex justify-content-between align-items-center mb-2">
     <span class="text-muted" *ngIf="selected.size > 0">
       {{ selected.size }} selected
     </span>
@@ -137,13 +147,22 @@
     </div>
   </div>
 
-  <!-- Table -->
-  <div class="card">
+  <!-- Measurements Table -->
+  <div *ngIf="activeTab !== 'STUDIES'" class="card">
     <div class="table-responsive">
       <table class="table table-hover mb-0">
         <thead>
           <tr>
-            <th style="width: 48px;"></th>
+            <th style="width: 48px;">
+              <input
+                type="checkbox"
+                class="form-check-input"
+                [checked]="allFilteredSelected"
+                (click)="$event.stopPropagation()"
+                (change)="toggleSelectAll($any($event.target).checked)"
+                aria-label="Select all measurements"
+              />
+            </th>
             <th>UUID</th>
             <th>Date</th>
             <th>BatchCode</th>
@@ -177,6 +196,45 @@
           <tr *ngIf="filteredItems.length === 0">
             <td colspan="6" class="text-center text-muted py-4">
               No results match the current filters.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Studies Table -->
+  <div *ngIf="activeTab === 'STUDIES'" class="card">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Context</th>
+            <th>UUID</th>
+            <th>Created</th>
+            <th>Electrode Batch</th>
+            <th>Protocol</th>
+            <th>Measurements</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let s of studies"
+            (click)="openStudy(s.uuid)"
+            (keydown.enter)="openStudy(s.uuid)"
+            tabindex="0"
+            style="cursor: pointer;"
+          >
+            <td>{{ s.context }}</td>
+            <td class="font-monospace">{{ s.uuid | slice:0:8 }}...</td>
+            <td>{{ s.createdAt | date:'yyyy-MM-dd' }}</td>
+            <td class="font-monospace">{{ s.electrodeBatchCode }}</td>
+            <td>{{ s.testProtocolId }}</td>
+            <td>{{ s.measurementCount }}</td>
+          </tr>
+          <tr *ngIf="studies.length === 0">
+            <td colspan="6" class="text-center text-muted py-4">
+              No calibration studies found.
             </td>
           </tr>
         </tbody>

@@ -10,6 +10,7 @@ import {
   MarkCalibrationResult
 } from '../../../components/mark-calibration-modal/measurement-list-modal.component';
 import { CalibrationStudyApiService } from '../../../../calibration/calibration-study-api.service';
+import { CalibrationStudySummaryDto } from '../../../../calibration/dto/calibration-study-summary.dto';
 
 @Component({
   selector: 'app-measurement-list',
@@ -26,7 +27,7 @@ export class MeasurementListComponent implements OnInit {
   // Filter & search state
   query = '';
   electrodeBatchFilter = '';
-  activeTab: 'ALL' | 'STANDARD' | 'CALIBRATION' = 'ALL';
+  activeTab: 'ALL' | 'STANDARD' | 'CALIBRATION' | 'STUDIES' = 'ALL';
   fromDate?: string;
   toDate?: string;
 
@@ -34,6 +35,10 @@ export class MeasurementListComponent implements OnInit {
   selected = new Set<string>();
   modalOpen = false;
   modalMeasurements: MeasurementSummaryDto[] = [];
+
+  // Studies tab
+  studies: CalibrationStudySummaryDto[] = [];
+  studiesLoaded = false;
 
   constructor(
     private api: MeasurementApiService,
@@ -66,9 +71,32 @@ export class MeasurementListComponent implements OnInit {
     this.router.navigate(['/measurements', uuid]);
   }
 
-  switchTab(tab: 'ALL' | 'STANDARD' | 'CALIBRATION'): void {
+  switchTab(tab: 'ALL' | 'STANDARD' | 'CALIBRATION' | 'STUDIES'): void {
     this.activeTab = tab;
     this.selected.clear();
+    if (tab === 'STUDIES' && !this.studiesLoaded) {
+      this.loadStudies();
+    }
+  }
+
+  loadStudies(): void {
+    this.loading = true;
+    this.calibrationStudyApi.list().subscribe({
+      next: (data) => {
+        this.studies = data;
+        this.studiesLoaded = true;
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = 'Could not load calibration studies.';
+        this.loading = false;
+        console.error(err);
+      }
+    });
+  }
+
+  openStudy(uuid: string): void {
+    this.router.navigate(['/calibration-studies', uuid]);
   }
 
   toggleSelection(uuid: string, checked: boolean): void {
@@ -84,6 +112,7 @@ export class MeasurementListComponent implements OnInit {
       case 'STANDARD': return m.measurementType === 'STANDARD';
       case 'CALIBRATION': return m.measurementType === 'CALIBRATION';
       case 'ALL': return true;
+      case 'STUDIES': return false;
     }
   }
 
@@ -196,6 +225,20 @@ export class MeasurementListComponent implements OnInit {
         console.error(err);
       }
     });
+  }
+
+  get allFilteredSelected(): boolean {
+    const items = this.filteredItems;
+    return items.length > 0 && items.every(m => this.selected.has(m.uuid));
+  }
+
+  toggleSelectAll(checked: boolean): void {
+    const items = this.filteredItems;
+    if (checked) {
+      items.forEach(m => this.selected.add(m.uuid));
+    } else {
+      items.forEach(m => this.selected.delete(m.uuid));
+    }
   }
 
   trackByUuid(_: number, m: { uuid: string }): string {
