@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnDestroy, OnInit, AfterViewChecked, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Chart, ChartConfiguration } from 'chart.js/auto';
@@ -14,7 +14,7 @@ import {RawSignalPayloadV1} from '../../dto/raw-signal.dto';
   templateUrl: './measurement-detail.component.html',
   styleUrls: ['./measurement-detail.component.scss'],
 })
-export class MeasurementDetailComponent implements OnInit, OnDestroy {
+export class MeasurementDetailComponent implements OnInit, AfterViewChecked, OnDestroy {
   @ViewChild('signalCanvas', { static: false }) canvas?: ElementRef<HTMLCanvasElement>;
 
   measurement?: MeasurementDetailDto;
@@ -23,6 +23,7 @@ export class MeasurementDetailComponent implements OnInit, OnDestroy {
   error: string | null = null;
 
   private chart?: Chart;
+  private needsChart = false;
 
   constructor(private route: ActivatedRoute, private api: MeasurementApiService) {}
 
@@ -42,9 +43,7 @@ export class MeasurementDetailComponent implements OnInit, OnDestroy {
         this.measurement = m;
         this.rawSignal = this.parseRawSignal(m.rawSignalJson);
         this.loading = false;
-
-        // Chart erst rendern, wenn Canvas existiert (nach dem Template-Render)
-        queueMicrotask(() => this.renderChart());
+        this.needsChart = true;
       },
       error: (err) => {
         this.error = 'Konnte Messung nicht laden.';
@@ -52,6 +51,13 @@ export class MeasurementDetailComponent implements OnInit, OnDestroy {
         console.error(err);
       }
     });
+  }
+
+  ngAfterViewChecked(): void {
+    if (this.needsChart && this.canvas?.nativeElement) {
+      this.needsChart = false;
+      this.renderChart();
+    }
   }
 
   ngOnDestroy(): void {
@@ -91,14 +97,9 @@ export class MeasurementDetailComponent implements OnInit, OnDestroy {
     this.chart = new Chart(this.canvas.nativeElement, config);
   }
 
-  private parseRawSignal(rawSignalJson: string): RawSignalPayloadV1 | undefined {
-    try {
-      const payload = JSON.parse(rawSignalJson) as RawSignalPayloadV1;
-      if (!payload?.points?.length) return undefined;
-      if (payload.formatVersion !== 1) return undefined;
-      return payload;
-    } catch {
-      return undefined;
-    }
+  private parseRawSignal(payload: RawSignalPayloadV1 | null): RawSignalPayloadV1 | undefined {
+    if (!payload?.points?.length) return undefined;
+    if (payload.formatVersion !== 1) return undefined;
+    return payload;
   }
 }

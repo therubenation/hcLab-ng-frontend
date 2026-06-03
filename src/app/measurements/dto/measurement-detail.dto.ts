@@ -1,3 +1,4 @@
+import { RawSignalPayloadV1 } from './raw-signal.dto';
 
 export interface AnalysisResultDto {
   source?: string | null;
@@ -18,8 +19,7 @@ export interface MeasurementDetailDto {
   performedByRole: string;
   effectiveParameters?: string | null;
 
-  // Raw signal (comes from backend as JSON string)
-  rawSignalJson: string;
+  rawSignalJson: RawSignalPayloadV1 | null;
 
   // Measurement classification
   measurementType?: string | null;

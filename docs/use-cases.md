@@ -55,7 +55,7 @@ Messungen finden, filtern und vergleichen.
 Rohdaten und Kontext einer Messung analysieren.
 
 **Erweiterte Inhalte in der Detailansicht:**
-- Rohsignal als Kurve (Plot)
+- Rohsignal als Kurve (Plot) mit korrekter Achsenbe
 - Messart (Standard / Kalibrierung)
 - Falls Kalibrierung:
   - Sollkonzentration + Einheit
