@@ -6,6 +6,7 @@ import { Chart, ChartConfiguration } from 'chart.js/auto';
 import { MeasurementApiService } from '../../measurement-api.service';
 import { MeasurementDetailDto } from '../../dto/measurement-detail.dto';
 import {RawSignalPayloadV1} from '../../dto/raw-signal.dto';
+import { analysisStatusLabel, analysisStatusTone } from '../../analysis-status';
 
 @Component({
   selector: 'app-measurement-detail',
@@ -21,6 +22,9 @@ export class MeasurementDetailComponent implements OnInit, AfterViewChecked, OnD
   rawSignal?: RawSignalPayloadV1;
   loading = false;
   error: string | null = null;
+
+  statusLabel = analysisStatusLabel;
+  statusTone = analysisStatusTone;
 
   private chart?: Chart;
   private needsChart = false;

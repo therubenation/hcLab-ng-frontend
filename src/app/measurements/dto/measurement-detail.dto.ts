@@ -1,5 +1,16 @@
 import { RawSignalPayloadV1 } from './raw-signal.dto';
 
+// Snapshot classification produced by the analysis (source + analysisVersion) at measurement time.
+// Includes values reserved by the backend for future use.
+export type AnalysisStatus =
+  | 'OK'
+  | 'BELOW_CALIBRATION_RANGE'
+  | 'ABOVE_CALIBRATION_RANGE'
+  | 'NO_PEAK_FOUND'
+  | 'TRACE_INVALID'
+  | 'BELOW_LOQ'
+  | 'LOW_SIGNAL_TO_NOISE';
+
 export interface AnalysisResultDto {
   source?: string | null;
   analysisVersion?: string | null;
@@ -9,6 +20,7 @@ export interface AnalysisResultDto {
   peakPotentialUnit?: string | null;
   concentrationValue?: number | null;
   concentrationUnit?: string | null;
+  status?: AnalysisStatus | null;
   qualityScore?: number | null;
 }
 

@@ -157,6 +157,18 @@
         </div>
 
         <div class="meta-item">
+          <span class="meta-label">Classification</span>
+          <span class="meta-value" data-testid="analysis-status">
+            <span
+              *ngIf="statusTone(ar.status) as tone; else plainStatus"
+              class="badge badge-pill"
+              [ngClass]="'badge-' + tone"
+            >{{ statusLabel(ar.status) }}</span>
+            <ng-template #plainStatus>{{ statusLabel(ar.status) }}</ng-template>
+          </span>
+        </div>
+
+        <div class="meta-item">
           <span class="meta-label">Quality Score</span>
           <span class="meta-value">{{ ar.qualityScore ?? '—' }}</span>
         </div>
