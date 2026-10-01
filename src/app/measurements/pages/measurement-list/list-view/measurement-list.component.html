@@ -106,12 +106,22 @@
             Studies
           </button>
         </li>
+        <li class="nav-item">
+          <button
+            class="nav-link"
+            [class.active]="activeTab === 'CURVES'"
+            (click)="switchTab('CURVES')"
+            type="button"
+          >
+            Calibration Curves
+          </button>
+        </li>
       </ul>
     </div>
   </div>
 
   <!-- Table action bar -->
-  <div *ngIf="activeTab !== 'STUDIES'" class="d-flex justify-content-between align-items-center mb-2">
+  <div *ngIf="activeTab !== 'STUDIES' && activeTab !== 'CURVES'" class="d-flex justify-content-between align-items-center mb-2">
     <span class="text-muted" *ngIf="selected.size > 0">
       {{ selected.size }} selected
     </span>
@@ -148,7 +158,7 @@
   </div>
 
   <!-- Measurements Table -->
-  <div *ngIf="activeTab !== 'STUDIES'" class="card">
+  <div *ngIf="activeTab !== 'STUDIES' && activeTab !== 'CURVES'" class="card">
     <div class="table-responsive">
       <table class="table table-hover mb-0">
         <thead>
@@ -235,6 +245,47 @@
           <tr *ngIf="studies.length === 0">
             <td colspan="6" class="text-center text-muted py-4">
               No calibration studies found.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Curves Table -->
+  <div *ngIf="activeTab === 'CURVES'" class="card">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Model</th>
+            <th>Analyte</th>
+            <th>Electrode Batch</th>
+            <th>Valid From</th>
+            <th>Valid To</th>
+            <th>Source Study</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let c of curves"
+            (click)="openCurve(c.id)"
+            (keydown.enter)="openCurve(c.id)"
+            tabindex="0"
+            style="cursor: pointer;"
+          >
+            <td>{{ c.id }}</td>
+            <td>{{ c.curveModelType }}</td>
+            <td>{{ c.analyte?.name || '—' }}</td>
+            <td class="font-monospace">{{ c.electrodeBatch?.electrodeBatchCode || '—' }}</td>
+            <td>{{ c.validFrom | date:'yyyy-MM-dd HH:mm' }}</td>
+            <td>{{ c.validTo ? (c.validTo | date:'yyyy-MM-dd HH:mm') : '—' }}</td>
+            <td>{{ c.calibrationStudy?.context || '—' }}</td>
+          </tr>
+          <tr *ngIf="curves.length === 0">
+            <td colspan="7" class="text-center text-muted py-4">
+              No calibration curves found.
             </td>
           </tr>
         </tbody>

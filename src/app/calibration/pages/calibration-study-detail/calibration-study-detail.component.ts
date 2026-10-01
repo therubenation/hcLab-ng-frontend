@@ -5,6 +5,8 @@ import { forkJoin } from 'rxjs';
 import { CalibrationStudyApiService } from '../../calibration-study-api.service';
 import { CalibrationStudyDetailDto, ConcentrationGroupDto } from '../../dto/calibration-study-detail.dto';
 import { ComputeCurveResponseDto } from '../../dto/compute-curve-response.dto';
+import { CalibrationCurveDto } from '../../dto/calibration-curve.dto';
+import { CalibrationCurveApiService } from '../../calibration-curve-api.service';
 import { MeasurementApiService } from '../../../measurements/measurement-api.service';
 
 @Component({
@@ -26,18 +28,21 @@ export class CalibrationStudyDetailComponent implements OnInit {
   curveResult: ComputeCurveResponseDto | null = null;
   curveError: string | null = null;
   curveSuccess = false;
+  savedCurves: CalibrationCurveDto[] = [];
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private api: CalibrationStudyApiService,
-    private measurementApi: MeasurementApiService
+    private measurementApi: MeasurementApiService,
+    private curveApi: CalibrationCurveApiService
   ) {}
 
   ngOnInit(): void {
     this.studyUuid = this.route.snapshot.paramMap.get('uuid');
     if (!this.studyUuid) return;
     this.loadStudy();
+    this.loadSavedCurves();
   }
 
   loadStudy(): void {
@@ -54,6 +59,20 @@ export class CalibrationStudyDetailComponent implements OnInit {
         console.error(err);
       }
     });
+  }
+
+  loadSavedCurves(): void {
+    if (!this.studyUuid) return;
+    this.curveApi.list().subscribe({
+      next: (curves) => {
+        this.savedCurves = curves.filter(c => c.calibrationStudy?.uuid === this.studyUuid);
+      },
+      error: (err) => console.error('Failed to load saved curves', err)
+    });
+  }
+
+  openCurve(id: number): void {
+    this.router.navigate(['/calibration-curves', id]);
   }
 
   openMeasurement(uuid: string): void {
@@ -125,6 +144,7 @@ export class CalibrationStudyDetailComponent implements OnInit {
         this.curveResult = result;
         this.computingCurve = false;
         this.curveSuccess = true;
+        this.loadSavedCurves();
       },
       error: (err) => {
         this.curveError = 'Failed to compute calibration curve.';

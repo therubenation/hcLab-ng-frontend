@@ -1,0 +1,123 @@
+<!-- Status messages -->
+<div *ngIf="loading" class="alert alert-info">Loading...</div>
+<div *ngIf="!loading && error" class="alert alert-danger">{{ error }}</div>
+
+<section *ngIf="curve && !loading && !error" class="container py-3">
+
+  <!-- Breadcrumb / Back -->
+  <div class="d-flex align-items-center gap-2 mb-3">
+    <a routerLink="/measurements" class="link">&larr; Back to Measurements</a>
+    <span class="text-muted">Calibration / Curve</span>
+  </div>
+
+  <!-- Page title -->
+  <div class="d-flex align-items-center gap-2 mb-4">
+    <h1 class="page-title">Calibration Curve #{{ curve.id }}</h1>
+    <span class="badge badge-pill badge-info">{{ curve.curveModelType }}</span>
+  </div>
+
+  <!-- Metadata card -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <span class="section-title">Curve Details</span>
+    </div>
+    <div class="card-body">
+      <div class="meta-grid">
+
+        <div class="meta-item">
+          <span class="meta-label">Analyte</span>
+          <span class="meta-value">{{ curve.analyte?.name || '—' }}</span>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-label">Electrode Batch Code</span>
+          <span class="meta-value mono">{{ curve.electrodeBatch?.electrodeBatchCode || '—' }}</span>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-label">Valid From</span>
+          <span class="meta-value">{{ curve.validFrom | date:'yyyy-MM-dd HH:mm:ss' }}</span>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-label">Valid To</span>
+          <span class="meta-value">{{ curve.validTo ? (curve.validTo | date:'yyyy-MM-dd HH:mm:ss') : '—' }}</span>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-label">Source Study</span>
+          <span class="meta-value">
+            <a
+              *ngIf="curve.calibrationStudy"
+              [routerLink]="['/calibration-studies', curve.calibrationStudy.uuid]"
+              class="link"
+            >{{ curve.calibrationStudy.context }}</a>
+            <span *ngIf="!curve.calibrationStudy" class="text-muted">—</span>
+          </span>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-label">Parameter Signature</span>
+          <span class="meta-value mono">{{ curve.parameterSignature }}</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart -->
+  <div *ngIf="points.length > 0" class="card mb-4">
+    <div class="card-header">
+      <span class="section-title">Curve</span>
+    </div>
+    <div class="card-body">
+      <div class="chart-container">
+        <canvas #curveCanvas></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Points table -->
+  <div *ngIf="points.length > 0" class="card mb-4">
+    <div class="card-header">
+      <span class="section-title">Points</span>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table mb-0">
+          <thead>
+            <tr>
+              <th>Concentration</th>
+              <th>n</th>
+              <th>Mean Peak Current</th>
+              <th>Std Dev Peak Current</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of points">
+              <td>{{ p.concentration }} {{ p.unit }}</td>
+              <td>{{ p.n }}</td>
+              <td>{{ p.meanPeak }}</td>
+              <td>{{ p.stddevPeak != null ? p.stddevPeak : '—' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="points.length === 0" class="alert alert-warning">
+    Curve data is not in point-aggregation format; showing raw data only.
+  </div>
+
+  <!-- Raw curve data -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <span class="section-title">Raw Curve Data</span>
+    </div>
+    <div class="card-body">
+      <pre class="curve-data-pre">{{ formattedCurveData }}</pre>
+    </div>
+  </div>
+
+</section>

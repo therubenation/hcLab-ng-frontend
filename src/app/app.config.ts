@@ -4,12 +4,14 @@ import { provideRouter, Routes } from '@angular/router';
 import { MeasurementListComponent } from './measurements/pages/measurement-list/list-view/measurement-list.component';
 import { MeasurementDetailComponent } from './measurements/pages/measurement-detail/measurement-detail.component';
 import { CalibrationStudyDetailComponent } from './calibration/pages/calibration-study-detail/calibration-study-detail.component';
+import { CalibrationCurveDetailComponent } from './calibration/pages/calibration-curve-detail/calibration-curve-detail.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'measurements', pathMatch: 'full' },
   { path: 'measurements', component: MeasurementListComponent },
   { path: 'measurements/:uuid', component: MeasurementDetailComponent },
-  { path: 'calibration-studies/:uuid', component: CalibrationStudyDetailComponent }
+  { path: 'calibration-studies/:uuid', component: CalibrationStudyDetailComponent },
+  { path: 'calibration-curves/:id', component: CalibrationCurveDetailComponent }
 ];
 
 export const appConfig: ApplicationConfig = {

@@ -11,6 +11,8 @@ import {
 } from '../../../components/mark-calibration-modal/measurement-list-modal.component';
 import { CalibrationStudyApiService } from '../../../../calibration/calibration-study-api.service';
 import { CalibrationStudySummaryDto } from '../../../../calibration/dto/calibration-study-summary.dto';
+import { CalibrationCurveApiService } from '../../../../calibration/calibration-curve-api.service';
+import { CalibrationCurveDto } from '../../../../calibration/dto/calibration-curve.dto';
 
 @Component({
   selector: 'app-measurement-list',
@@ -27,7 +29,7 @@ export class MeasurementListComponent implements OnInit {
   // Filter & search state
   query = '';
   electrodeBatchFilter = '';
-  activeTab: 'ALL' | 'STANDARD' | 'CALIBRATION' | 'STUDIES' = 'ALL';
+  activeTab: 'ALL' | 'STANDARD' | 'CALIBRATION' | 'STUDIES' | 'CURVES' = 'ALL';
   fromDate?: string;
   toDate?: string;
 
@@ -40,9 +42,14 @@ export class MeasurementListComponent implements OnInit {
   studies: CalibrationStudySummaryDto[] = [];
   studiesLoaded = false;
 
+  // Curves tab
+  curves: CalibrationCurveDto[] = [];
+  curvesLoaded = false;
+
   constructor(
     private api: MeasurementApiService,
     private calibrationStudyApi: CalibrationStudyApiService,
+    private calibrationCurveApi: CalibrationCurveApiService,
     private router: Router
   ) {}
 
@@ -71,11 +78,14 @@ export class MeasurementListComponent implements OnInit {
     this.router.navigate(['/measurements', uuid]);
   }
 
-  switchTab(tab: 'ALL' | 'STANDARD' | 'CALIBRATION' | 'STUDIES'): void {
+  switchTab(tab: 'ALL' | 'STANDARD' | 'CALIBRATION' | 'STUDIES' | 'CURVES'): void {
     this.activeTab = tab;
     this.selected.clear();
     if (tab === 'STUDIES' && !this.studiesLoaded) {
       this.loadStudies();
+    }
+    if (tab === 'CURVES' && !this.curvesLoaded) {
+      this.loadCurves();
     }
   }
 
@@ -99,6 +109,26 @@ export class MeasurementListComponent implements OnInit {
     this.router.navigate(['/calibration-studies', uuid]);
   }
 
+  loadCurves(): void {
+    this.loading = true;
+    this.calibrationCurveApi.list().subscribe({
+      next: (data) => {
+        this.curves = data;
+        this.curvesLoaded = true;
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = 'Could not load calibration curves.';
+        this.loading = false;
+        console.error(err);
+      }
+    });
+  }
+
+  openCurve(id: number): void {
+    this.router.navigate(['/calibration-curves', id]);
+  }
+
   toggleSelection(uuid: string, checked: boolean): void {
     if (checked) {
       this.selected.add(uuid);
@@ -113,6 +143,7 @@ export class MeasurementListComponent implements OnInit {
       case 'CALIBRATION': return m.measurementType === 'CALIBRATION';
       case 'ALL': return true;
       case 'STUDIES': return false;
+      case 'CURVES': return false;
     }
   }
 

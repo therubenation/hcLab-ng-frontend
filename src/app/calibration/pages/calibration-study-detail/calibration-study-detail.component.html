@@ -178,6 +178,7 @@
 
       <div *ngIf="curveSuccess" class="alert alert-success" style="margin-top: 12px;">
         Calibration curve saved successfully.
+        <a *ngIf="curveResult" [routerLink]="['/calibration-curves', curveResult.curveId]" class="link">View curve</a>
       </div>
 
       <div *ngIf="curveResult" class="curve-result">
@@ -199,6 +200,35 @@
           <span class="meta-label">Curve Data</span>
           <pre class="curve-data-pre">{{ formattedCurveData }}</pre>
         </div>
+      </div>
+
+      <div class="curve-result">
+        <span class="meta-label">Saved curves for this study</span>
+        <table *ngIf="savedCurves.length > 0" class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Model</th>
+              <th>Valid From</th>
+              <th>Valid To</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let c of savedCurves"
+              (click)="openCurve(c.id)"
+              (keydown.enter)="openCurve(c.id)"
+              tabindex="0"
+              style="cursor: pointer;"
+            >
+              <td>{{ c.id }}</td>
+              <td>{{ c.curveModelType }}</td>
+              <td>{{ c.validFrom | date:'yyyy-MM-dd HH:mm:ss' }}</td>
+              <td>{{ c.validTo ? (c.validTo | date:'yyyy-MM-dd HH:mm:ss') : '—' }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div *ngIf="savedCurves.length === 0" class="text-muted">No curves saved yet.</div>
       </div>
     </div>
   </div>
